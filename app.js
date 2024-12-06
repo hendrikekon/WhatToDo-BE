@@ -4,7 +4,10 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const cors = require('cors');
+const { decodeToken } = require('./middlewares');
 const todosRoute = require('./app/Todos/router');
+const userRoute = require('./app/User/router');
+
 
 
 var app = express();
@@ -21,9 +24,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use('/', indexRouter);
-// app.use('/users', usersRouter);
+app.use(decodeToken());
+
 app.use('/api', todosRoute);
+app.use('/auth', userRoute);
 
 
 app.use('/', function(req, res){
