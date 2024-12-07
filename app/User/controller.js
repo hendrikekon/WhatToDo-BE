@@ -110,6 +110,11 @@ const update = async(req, res, next) => {
         let { id } =req.params;
         let payload = req.body;
         if (!id) {return res.status(404).json({error: 1, message: 'User not found'});}
+        if (payload.password) {
+            const bcrypt = require('bcrypt');
+            const HASH_ROUND = 10;
+            payload.password = bcrypt.hashSync(payload.password, HASH_ROUND);
+        }
         let user = await User.findByIdAndUpdate(id, payload, {new: true});
         return res.status(200).json({
             success: true,

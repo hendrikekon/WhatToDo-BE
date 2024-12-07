@@ -37,8 +37,20 @@ userSchema.path('email').validate(async function(value) {
 //hash Password
 const HASH_ROUND = 10;
 userSchema.pre('save', function(next) {
-    this.password = bcrypt.hashSync(this.password, HASH_ROUND);
+    if (this.isModified('password')) {
+        this.password = bcrypt.hashSync(this.password, HASH_ROUND);
+    }
     next();
 });
+
+// userSchema.pre('findOneAndUpdate', function(next) {
+//     const update = this.getUpdate();
+//     if (update.password) {
+//         update.password = bcrypt.hashSync(update.password, HASH_ROUND);
+//         this.setUpdate(update);
+//     }
+//     next();
+// });
+
 
 module.exports = model('User', userSchema);
