@@ -108,17 +108,31 @@ const me = (req, res, next) => {
 const update = async(req, res, next) => {
     try {
         let { id } =req.params;
-        let payload = req.body;
+        let { oldPassword, newPassword, ...payload } = req.body;
+
         if (!id) {return res.status(404).json({error: 1, message: 'User not found'});}
-        if (payload.password) {
-            const bcrypt = require('bcrypt');
-            const HASH_ROUND = 10;
-            payload.password = bcrypt.hashSync(payload.password, HASH_ROUND);
+        // find user to get the username to compare
+        let user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({ error: 1, message: 'User not found' });
         }
-        let user = await User.findByIdAndUpdate(id, payload, {new: true});
+        // check old password if provided and compare with the user's password
+        if (oldPassword && newPassword) {
+            const passwordMatch = bcrypt.compareSync(oldPassword, user.password);
+
+            if (!passwordMatch) {
+                return res.status(400).json({
+                    error: 1,
+                    message: 'Incorrect old password'
+                });
+            }
+            const HASH_ROUND = 10;
+            payload.password = bcrypt.hashSync(newPassword, HASH_ROUND);
+        }
+        let response = await User.findByIdAndUpdate(id, payload, {new: true});
         return res.status(200).json({
             success: true,
-            user
+            response
         });
 
     } catch (error) {

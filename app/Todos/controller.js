@@ -7,7 +7,10 @@ const store = async(req, res, next) =>{
         let payload = { ...req.body, user };
         let todo = new Todos(payload);
         await todo.save();
-        return res.status(200).json(todo);
+        return res.status(201).json({
+            success: true,
+            data: todo,
+        });
     } catch (error) {
         res.status(400).json({
             error: 1,
@@ -40,7 +43,7 @@ const update = async(req,res,next) => {
     try {
         let { id } = req.params;
         let payload = req.body;
-        let todo = await Todos.findByIdAndUpdate({ _id: id, user: req.user._id },id,payload, {new: true});
+        let todo = await Todos.findByIdAndUpdate({ _id: id, user: req.user._id }, payload, {new: true});
         if (!todo) {
             return res.status(404).json({
                 success: false,

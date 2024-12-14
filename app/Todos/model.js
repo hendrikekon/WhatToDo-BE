@@ -9,7 +9,6 @@ const todosSchema = new Schema({
     done: {
         type: Boolean,
         default: false,
-        required: false,
     },
     user: {
         type: Schema.Types.ObjectId,
